@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كتاب الفيزياء التفاعلي</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Tahoma,Arial;
+ background:#10182d;
+ color:white;
+}
+header{
+ background:#19294a;
+ padding:20px;
+ text-align:center;
+ border-bottom:2px solid #43d5e5;
+}
+header h1{margin:0;color:#55e3f0}
+.container{
+ display:flex;
+ gap:15px;
+ padding:15px;
+ max-width:1200px;
+ margin:auto;
+}
+aside{
+ width:270px;
+ background:#192746;
+ padding:15px;
+ border-radius:15px;
+ height:fit-content;
+}
+main{
+ flex:1;
+ background:#1a2948;
+ border-radius:15px;
+ padding:22px;
+ min-height:550px;
+ box-shadow:0 10px 30px #0005;
+}
+input[type=search]{
+ width:100%;
+ padding:12px;
+ border-radius:8px;
+ border:0;
+ margin-bottom:12px;
+}
+.lesson{
+ display:block;
+ width:100%;
+ padding:12px;
+ margin:6px 0;
+ background:#263c62;
+ color:white;
+ border:1px solid #40577e;
+ border-radius:8px;
+ text-align:right;
+ cursor:pointer;
+}
+.lesson.active,.lesson:hover{
+ background:#087f91;
+}
+h2{color:#55e3f0}
+h3{color:#ffd166}
+.formula{
+ direction:ltr;
+ text-align:center;
+ background:#0d1930;
+ border:1px dashed #55e3f0;
+ padding:18px;
+ border-radius:10px;
+ font-size:23px;
+ margin:15px 0;
+}
+.section{
+ background:#101d36;
+ padding:15px;
+ border-radius:12px;
+ margin:15px 0;
+}
+button{
+ padding:11px 18px;
+ border:0;
+ border-radius:8px;
+ background:#55d6e8;
+ color:#071426;
+ font-weight:bold;
+ cursor:pointer;
+ margin:4px;
+}
+button.secondary{
+ background:#344a70;
+ color:white;
+}
+button:disabled{opacity:.4}
+input[type=range]{width:100%;accent-color:#55d6e8}
+.answer{
+ display:block;
+ padding:10px;
+ background:#263c62;
+ margin:7px 0;
+ border-radius:8px;
+}
+#feedback{color:#ffd166;font-weight:bold;margin-top:10px}
+.controls{
+ display:flex;
+ justify-content:space-between;
+ flex-wrap:wrap;
+ margin-top:20px;
+}
+@media(max-width:750px){
+ .container{flex-direction:column}
+ aside{width:100%}
+ main{min-height:400px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📘 كتاب الفيزياء التفاعلي</h1>
+<p>شرح • قوانين • أمثلة • محاكاة • اختبارات</p>
+</header>
+
+<div class="container">
+
+<aside>
+<h3>📚 فهرس الدروس</h3>
+<input type="search" id="search" placeholder="ابحث عن درس..." oninput="drawList()">
+<div id="lessonList"></div>
+</aside>
+
+<main>
+<div id="content"></div>
+
+<div class="controls">
+<button class="secondary" onclick="previousLesson()" id="prev">السابق</button>
+<button onclick="nextLesson()" id="next">التالي ←</button>
+</div>
+</main>
+
+</div>
+
+<script>
+
+const lessons = [
+
+{
+unit:"الميكانيكا",
+title:"السرعة المتجهة",
+explain:"السرعة المتجهة هي معدل تغير الإزاحة بالنسبة للزمن، وهي كمية فيزيائية لها مقدار واتجاه.",
+law:"v = Δx / Δt",
+example:"جسم تحرك إزاحة 100 متر خلال 5 ثوانٍ. السرعة المتجهة = 100 ÷ 5 = 20 m/s.",
+question:"ما قانون السرعة المتجهة المتوسطة؟",
+answers:["المسافة × الزمن","الإزاحة ÷ الزمن","الزمن ÷ الإزاحة"],
+correct:1,
+reason:"السرعة المتجهة المتوسطة تساوي الإزاحة مقسومة على الزمن."
+},
+
+{
+unit:"الميكانيكا",
+title:"حركة المقذوفات",
+explain:"حركة المقذوفات تتكون من حركة أفقية منتظمة وحركة رأسية بعجلة الجاذبية الأرضية.",
+law:"x = v₀ cos(θ)t",
+example:"عند قذف جسم أفقياً، تظل سرعته الأفقية ثابتة إذا أهملنا مقاومة الهواء.",
+question:"ما اتجاه عجلة الجاذبية؟",
+answers:["لأعلى","لأسفل","أفقياً"],
+correct:1,
+reason:"عجلة الجاذبية الأرضية تتجه دائماً إلى أسفل."
+},
+
+{
+unit:"الميكانيكا",
+title:"عزم القوة",
+explain:"عزم القوة هو قدرة القوة على إحداث دوران حول محور.",
+law:"τ = F × d",
+example:"قوة مقدارها 10 نيوتن تؤثر على بعد 2 متر من المحور. العزم = 20 نيوتن.متر.",
+question:"كيف نحسب عزم القوة؟",
+answers:["القوة × ذراع العزم","القوة ÷ الزمن","الكتلة × السرعة"],
+correct:0,
+reason:"عزم القوة يساوي القوة مضروبة في ذراع العزم العمودي."
+},
+
+{
+unit:"الميكانيكا",
+title:"الشغل والقدرة",
+explain:"الشغل انتقال الطاقة نتيجة تأثير قوة تُحدث إزاحة، والقدرة هي معدل بذل الشغل.",
+law:"P = W / t",
+example:"آلة تبذل شغلاً مقداره 200 جول خلال 4 ثوانٍ. قدرتها 50 وات.",
+question:"ما وحدة القدرة؟",
+answers:["جول","وات","نيوتن"],
+correct:1,
+reason:"وحدة قياس القدرة هي الواط."
+},
+
+{
+unit:"الحركة الاهتزازية",
+title:"الحركة التوافقية البسيطة",
+explain:"هي حركة اهتزازية تتناسب فيها العجلة طردياً مع الإزاحة وتكون في عكس اتجاهها.",
+law:"a = -ω²x",
+example:"حركة كتلة متصلة بنابض مثالي مثال على الحركة التوافقية البسيطة.",
+question:"اتجاه العجلة بالنسبة للإزاحة؟",
+answers:["نفس الاتجاه","عكس الاتجاه","عمودي عليها"],
+correct:1,
+reason:"العجلة تكون دائماً في عكس اتجاه الإزاحة."
+},
+
+{
+unit:"الموجات",
+title:"سرعة الموجة",
+explain:"الموجة اضطراب ينقل الطاقة من مكان إلى آخر دون انتقال دائم للمادة.",
+law:"v = f × λ",
+example:"موجة ترددها 10 هرتز وطولها الموجي 2 متر. سرعتها 20 متر/ثانية.",
+question:"ما قانون سرعة الموجة؟",
+answers:["v = fλ","v = f/λ","v = f+λ"],
+correct:0,
+reason:"سرعة الموجة تساوي التردد مضروباً في الطول الموجي."
+},
+
+{
+unit:"الغازات والحرارة",
+title:"قانون بويل",
+explain:"عند ثبوت درجة الحرارة، يتناسب حجم كمية معينة من الغاز عكسياً مع ضغطه.",
+law:"P₁V₁ = P₂V₂",
+example:"إذا تضاعف ضغط الغاز عند ثبوت الحرارة، يصبح حجمه نصف حجمه الأصلي.",
+question:"العلاقة بين الضغط والحجم عند ثبوت الحرارة؟",
+answers:["طردية","عكسية","لا توجد علاقة"],
+correct:1,
+reason:"قانون بويل يوضح العلاقة العكسية بين الضغط والحجم."
+},
+
+{
+unit:"الكهرباء",
+title:"قانون كولوم",
+explain:"تتأثر الشحنات الكهربائية بقوة تتناسب مع حاصل ضرب الشحنتين وعكسياً مع مربع المسافة.",
+law:"F = k q₁q₂ / r²",
+example:"زيادة المسافة بين شحنتين إلى الضعف تجعل القوة ربع قيمتها.",
+question:"القوة الكهربائية تتناسب عكسياً مع؟",
+answers:["المسافة","مربع المسافة","الكتلة"],
+correct:1,
+reason:"مربع المسافة يوجد في مقام قانون كولوم."
+},
+
+{
+unit:"الدوائر الكهربائية",
+title:"قانون أوم",
+explain:"يربط قانون أوم بين فرق الجهد وشدة التيار والمقاومة.",
+law:"V = I × R",
+example:"مقاومة 5 أوم يمر بها تيار 2 أمبير. فرق الجهد = 10 فولت.",
+question:"ما قانون أوم؟",
+answers:["V = IR","V = I/R","V = R/I"],
+correct:0,
+reason:"فرق الجهد يساوي شدة التيار مضروبة في المقاومة."
+},
+
+{
+unit:"المغناطيسية",
+title:"الحث الكهرومغناطيسي",
+explain:"ينشأ جهد مستحث عندما يتغير الفيض المغناطيسي خلال ملف.",
+law:"ε = -N ΔΦ / Δt",
+example:"زيادة معدل تغير الفيض المغناطيسي تزيد مقدار القوة الدافعة المستحثة.",
+question:"متى ينشأ جهد مستحث؟",
+answers:["عند ثبات الفيض","عند تغير الفيض","عند انعدام المجال دائماً"],
+correct:1,
+reason:"تغير الفيض المغناطيسي هو سبب نشأة الجهد المستحث."
+}
+
+];
+
+let current=0;
+
+function drawList(){
+ const search=document.getElementById("search").value;
+ let html="";
+
+ lessons.forEach((lesson,i)=>{
+  if(lesson.title.includes(search)||lesson.unit.includes(search)){
+   html+=`<button class="lesson ${i===current?'active':''}" onclick="openLesson(${i})">
+   ${i+1}. ${lesson.title}
+   </button>`;
+  }
+ });
+
+ document.getElementById("lessonList").innerHTML=html;
+}
+
+function openLesson(i){
+ current=i;
+ showLesson();
+ drawList();
+}
+
+function showLesson(){
+
+ const l=lessons[current];
+
+ document.getElementById("content").innerHTML=`
+
+ <p style="color:#55e3f0">${l.unit} | الدرس ${current+1}</p>
+
+ <h2>${l.title}</h2>
+
+ <div class="section">
+ <h3>📖 الشرح</h3>
+ <p>${l.explain}</p>
+ </div>
+
+ <h3>📐 القانون</h3>
+ <div class="formula">${l.law}</div>
+
+ <div class="section">
+ <h3>📝 مثال محلول</h3>
+ <p>${l.example}</p>
+ </div>
+
+ <div class="section">
+ <h3>🔬 محاكاة تفاعلية</h3>
+ <p>غيّر القيم وشاهد الناتج:</p>
+
+ <label>القيمة الأولى: <span id="aVal">5</span></label>
+ <input type="range" id="a" min="1" max="20" value="5" oninput="simulate()">
+
+ <label>القيمة الثانية: <span id="bVal">4</span></label>
+ <input type="range" id="b" min="1" max="20" value="4" oninput="simulate()">
+
+ <div class="formula" id="result">20</div>
+ </div>
+
+ <div class="section">
+ <h3>🧠 اختبر نفسك</h3>
+ <p>${l.question}</p>
+
+ ${l.answers.map((a,i)=>`
+ <label class="answer">
+ <input type="radio" name="answer" value="${i}">
+ ${a}
+ </label>
+ `).join("")}
+
+ <button onclick="checkAnswer()">تحقق من الإجابة</button>
+
+ <div id="feedback"></div>
+ </div>
+ `;
+
+ document.getElementById("prev").disabled=current===0;
+ document.getElementById("next").disabled=current===lessons.length-1;
+
+ simulate();
+}
+
+function simulate(){
+ const a=Number(document.getElementById("a").value);
+ const b=Number(document.getElementById("b").value);
+
+ document.getElementById("aVal").textContent=a;
+ document.getElementById("bVal").textContent=b;
+ document.getElementById("result").textContent="الناتج = "+(a*b);
+}
+
+function checkAnswer(){
+
+ const selected=document.querySelector('input[name="answer"]:checked');
+ const feedback=document.getElementById("feedback");
+
+ if(!selected){
+  feedback.textContent="اختر إجابة أولاً.";
+  return;
+ }
+
+ const l=lessons[current];
+
+ if(Number(selected.value)===l.correct){
+  feedback.textContent="✅ إجابة صحيحة! "+l.reason;
+ }else{
+  feedback.textContent="❌ حاول مرة أخرى. "+l.reason;
+ }
+}
+
+function nextLesson(){
+ if(current<lessons.length-1)openLesson(current+1);
+}
+
+function previousLesson(){
+ if(current>0)openLesson(current-1);
+}
+
+drawList();
+showLesson();
+
+</script>
+
+</body>
+</html>
